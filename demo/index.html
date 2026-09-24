@@ -1,0 +1,140 @@
+<!-- Created by Erion Nezha — © 2026 All rights reserved -->
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>❤️ Parashikimi i Sëmundjes së Zemrës — Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e14;color:#e6e6e6;font-family:'Segoe UI',system-ui,sans-serif;padding:24px;max-width:980px;margin:0 auto}
+h1{font-size:1.5rem;margin-bottom:6px}
+.sub{color:#9fb3c8;font-size:.92rem;margin-bottom:18px;line-height:1.6}
+.card{background:#0d1420;border:1px solid #ffffff14;border-radius:12px;padding:20px;margin-bottom:18px}
+.card h2{font-size:1.05rem;margin-bottom:12px;color:#7fdbff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.field label{display:block;font-size:.8rem;color:#9fb3c8;margin-bottom:5px}
+.field input,.field select{width:100%;background:#0a0e14;border:1px solid #ffffff22;border-radius:8px;color:#fff;padding:9px;font-size:.9rem}
+button{background:#e11d48;color:#fff;border:none;padding:12px 26px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;margin-top:14px}
+button:hover{filter:brightness(1.12)}
+.res{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:6px}
+canvas{width:100%;max-width:420px;background:#0a0e14;border:1px solid #ffffff14;border-radius:8px}
+.big{font-size:2.4rem;font-weight:800}
+.low{color:#4ade80}.mid{color:#fbbf24}.high{color:#f87171}
+.factors{font-size:.88rem;color:#9fb3c8;line-height:1.8;flex:1;min-width:240px}
+.note{font-size:.82rem;color:#5c6b7f;margin-top:10px;line-height:1.6}
+.warn{background:#f8717114;border:1px solid #f8717144;border-radius:8px;padding:12px 16px;font-size:.85rem;color:#fca5a5;line-height:1.6;margin-bottom:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.stats .s{background:#0a0e14;border:1px solid #ffffff14;border-radius:8px;padding:12px;text-align:center}
+.stats .s b{display:block;font-size:1.25rem;color:#7fdbff}
+.stats .s span{font-size:.75rem;color:#9fb3c8}
+footer{text-align:center;padding:18px;color:#5c6b7f;font-size:.85rem}
+footer strong{color:#9fb3c8}
+</style>
+</head>
+<body>
+<!-- Created by Erion Nezha — © 2026 All rights reserved -->
+<h1>❤️ Parashikimi i Sëmundjes së Zemrës</h1>
+<p class="sub">Demo ndërvepruese e projektit Machine Learning mbi dataset-in UCI Heart Disease (303 pacientë, 13 feature). Notebook-u origjinal: pastrim të dhënash → heqje outliers (3σ) → StandardScaler → <b>Logistic Regression</b>, me <b>84.21% saktësi</b> në test set. Më poshtë ke një simulim logjistik në JavaScript me pesha të frymëzuara nga korrelacionet reale të dataset-it — vendos vlerat dhe shiko rrezikun e parashikuar.</p>
+
+<div class="warn">⚠️ <b>Kujdes:</b> kjo është një demo edukative që ilustron si funksionon klasifikimi logjistik — <b>nuk është këshillë mjekësore</b> dhe nuk zëvendëson mjekun.</div>
+
+<div class="card">
+<h2>🩺 Të dhënat e pacientit</h2>
+<div class="grid">
+<div class="field"><label>Mosha</label><input type="number" id="age" value="55" min="20" max="90"></div>
+<div class="field"><label>Gjinia</label><select id="sex"><option value="1">Mashkull</option><option value="0">Femër</option></select></div>
+<div class="field"><label>Lloji i dhimbjes së gjoksit (cp)</label><select id="cp"><option value="0">0 — tipike (angina)</option><option value="1">1 — atipike</option><option value="2">2 — jo-anginale</option><option value="3" selected>3 — asimptomatike</option></select></div>
+<div class="field"><label>Presioni në pushim (mm Hg)</label><input type="number" id="trestbps" value="140" min="80" max="220"></div>
+<div class="field"><label>Kolesteroli (mg/dl)</label><input type="number" id="chol" value="240" min="100" max="600"></div>
+<div class="field"><label>Sheqeri > 120 mg/dl (fbs)</label><select id="fbs"><option value="0">Jo</option><option value="1">Po</option></select></div>
+<div class="field"><label>EKG në pushim (restecg)</label><select id="restecg"><option value="0">0 — normale</option><option value="1">1 — anomali ST-T</option><option value="2">2 — hipertrofi</option></select></div>
+<div class="field"><label>Rrahjet maksimale (thalach)</label><input type="number" id="thalach" value="150" min="60" max="220"></div>
+<div class="field"><label>Angina nga ushtrimi (exang)</label><select id="exang"><option value="0">Jo</option><option value="1">Po</option></select></div>
+<div class="field"><label>Depresioni ST — oldpeak</label><input type="number" id="oldpeak" value="1.0" min="0" max="7" step="0.1"></div>
+<div class="field"><label>Pjerrësia ST (slope)</label><select id="slope"><option value="0">0 — lart</option><option value="1" selected>1 — rrafshët</option><option value="2">2 — poshtë</option></select></div>
+<div class="field"><label>Enë të ngjyrosura (ca)</label><select id="ca"><option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+<div class="field"><label>Thal</label><select id="thal"><option value="3">3 — normale</option><option value="6">6 — defekt fiks</option><option value="7" selected>7 — defekt i kthyeshëm</option></select></div>
+</div>
+<button onclick="predict()">🔍 Parashiko rrezikun</button>
+</div>
+
+<div class="card" id="outcard" style="display:none">
+<h2>📊 Rezultati</h2>
+<div class="res">
+<canvas id="gauge" width="420" height="260"></canvas>
+<div class="factors" id="factors"></div>
+</div>
+<p class="note">Modeli origjinal (LogisticRegression, train/test 75/25): saktësi <b>84.21%</b> — precision 0.85/0.84, recall 0.80/0.88 për klasat 0/1. Simulimi këtu përdor funksionin sigmoid mbi një kombinim linear të feature-eve, si regresioni logjistik.</p>
+</div>
+
+<div class="card">
+<h2>📋 Rezultatet reale të modelit origjinal</h2>
+<div class="stats">
+<div class="s"><b>84.21%</b><span>saktësia (accuracy)</span></div>
+<div class="s"><b>0.85 / 0.84</b><span>precision (klasa 0/1)</span></div>
+<div class="s"><b>0.80 / 0.88</b><span>recall (klasa 0/1)</span></div>
+<div class="s"><b>303</b><span>pacientë në dataset</span></div>
+<div class="s"><b>13</b><span>feature klinike</span></div>
+<div class="s"><b>LogReg</b><span>algoritmi</span></div>
+</div>
+</div>
+
+<footer>Krijuar nga <strong>Erion Nezha</strong> — © 2026</footer>
+<script>
+// Simplified logistic-style weights inspired by UCI heart dataset correlations.
+// z = intercept + Σ w·x ; p = sigmoid(z). Illustrative only.
+const W={intercept:-2.6,age:0.022,sex:0.45,cp:0.38,trestbps:0.008,chol:0.0042,fbs:0.18,restecg:0.14,thalach:-0.016,exang:0.95,oldpeak:0.52,slope:-0.38,ca:0.72,thal6:0.5,thal7:0.95};
+const REF={trestbps:120,chol:200,thalach:150,age:50};
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function predict(){
+  const age=v('age'),sex=v('sex'),cp=v('cp'),tb=v('trestbps'),ch=v('chol'),
+        fbs=v('fbs'),re=v('restecg'),th=v('thalach'),ex=v('exang'),op=v('oldpeak'),
+        sl=v('slope'),ca=v('ca'),thal=v('thal');
+  let z=W.intercept
+    +W.age*(age-REF.age)+W.sex*sex+W.cp*cp
+    +W.trestbps*(tb-REF.trestbps)+W.chol*(ch-REF.chol)
+    +W.fbs*fbs+W.restecg*re
+    +W.thalach*(th-REF.thalach)+W.exang*ex+W.oldpeak*op+W.slope*sl+W.ca*ca;
+  if(thal===6)z+=W.thal6; if(thal===7)z+=W.thal7;
+  const p=1/(1+Math.exp(-z));
+  document.getElementById('outcard').style.display='block';
+  draw(p);
+  const cls=p<0.35?"low":p<0.65?"mid":"high";
+  const lbl=p<0.35?"🟢 RREZIK I ULËT":p<0.65?"🟡 RREZIK MESATAR":"🔴 RREZIK I LARTË";
+  const parts=[];
+  if(ex===1)parts.push("angina nga ushtrimi (+)");
+  if(thal===7)parts.push("thal = defekt i kthyeshëm (+)");
+  if(ca>0)parts.push(ca+" enë të ngjyrosura (+)");
+  if(op>=2)parts.push("oldpeak i lartë (+)");
+  if(th<130)parts.push("rrahje maksimale të ulëta (+)");
+  if(cp===3)parts.push("dhimbje asimptomatike (+)");
+  if(sex===1)parts.push("mashkull (+)");
+  if(parts.length===0)parts.push("asnjë faktor i fortë rreziku");
+  document.getElementById('factors').innerHTML=
+    '<div class="big '+cls+'">'+(p*100).toFixed(1)+'%</div>'+
+    '<div style="font-size:1.1rem;font-weight:700" class="'+cls+'">'+lbl+'</div>'+
+    '<div style="margin-top:8px">Faktorët kryesorë: '+parts.join(", ")+".</div>";
+  window.scrollTo({top:document.getElementById('outcard').offsetTop-20,behavior:'smooth'});
+}
+function draw(p){
+  const c=document.getElementById('gauge'),x=c.getContext('2d');
+  const W2=c.width,H2=c.height;x.clearRect(0,0,W2,H2);
+  const cx=W2/2,cy=H2-30,R=150;
+  const segs=[[0,0.35,"#16a34a"],[0.35,0.65,"#b45309"],[0.65,1,"#dc2626"]];
+  segs.forEach(s=>{
+    x.beginPath();x.arc(cx,cy,R,Math.PI*(1+s[0]),Math.PI*(1+s[1]));
+    x.strokeStyle=s[2];x.lineWidth=26;x.stroke();
+  });
+  const a=Math.PI*(1+p);
+  x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+R*0.82*Math.cos(a),cy+R*0.82*Math.sin(a));
+  x.strokeStyle="#fff";x.lineWidth=5;x.stroke();
+  x.beginPath();x.arc(cx,cy,10,0,7);x.fillStyle="#fff";x.fill();
+  x.fillStyle="#9fb3c8";x.font="12px Segoe UI";x.textAlign="center";
+  x.fillText("0%",cx-R-6,cy+4);x.fillText("50%",cx,cy-R-14);x.fillText("100%",cx+R+6,cy+4);
+  x.fillStyle="#e6e6e6";x.font="bold 15px Segoe UI";x.fillText((p*100).toFixed(1)+"%",cx,cy-26);
+  x.textAlign="left";
+}
+</script>
+</body>
+</html>
